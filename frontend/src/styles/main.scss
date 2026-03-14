@@ -1,0 +1,27 @@
+@use "./variables" as *;
+@use "./mixins" as *;
+
+@forward "./_variables.scss";
+@forward "./_mixins.scss";
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+main {
+  isolation: isolate;
+  font-family: $fontFamily;
+  line-height: 100%;
+
+  height: 100dvh;
+
+  background-color: $colorNeutral950;
+}
+
+button {
+  font-family: $fontFamily;
+}

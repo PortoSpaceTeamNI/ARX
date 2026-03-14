@@ -1,0 +1,39 @@
+@use '../../styles/main.scss' as *;
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    @include text($color: $colorNeutral200);
+
+    .tableRow {
+        border-bottom: 1px solid $colorNeutral700;
+
+        &:nth-child(even) {
+            background-color: $colorNeutral900;
+        }
+
+        .tableHead {
+            padding: spacing(2) 0;
+
+            &:first-child {
+                padding-left: spacing(2);
+            }
+
+            &:last-child {
+                padding-right: spacing(2);
+            }
+        }
+
+        .tableCell {
+            padding: spacing(2) 0;
+
+            &:first-child {
+                padding-left: spacing(2);
+            }
+
+            &:last-child {
+                padding-right: spacing(2);
+            }
+        }
+    }
+}

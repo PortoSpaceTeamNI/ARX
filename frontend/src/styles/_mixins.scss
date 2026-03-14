@@ -1,0 +1,43 @@
+@use './variables' as *;
+
+@mixin text($size: null, $line-height: null, $weight: null, $color: null) {
+  font-size: $size;
+  line-height: $line-height;
+  font-weight: $weight;
+  color: $color;
+}
+
+@mixin border($width, $color, $radius: null) {
+  border: $width solid $color;
+  border-radius: $radius;
+}
+
+@mixin outline($width, $color) {
+  outline: $width solid $color;
+}
+
+@mixin flex($direction: null, $justify: null, $align: null, $gap: null) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+}
+
+@mixin position($position: null, $top: null, $right: null, $bottom: null, $left: null, $z-index: initial) {
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+  z-index: $z-index;
+}
+
+@mixin centerDisplacement($x: null, $y: null) {
+  @include position(absolute, 50%, 50%);
+  transform: translate(calc(50% + $x), calc(-50% + $y));
+}
+
+@function spacing($size) {
+  @return $size * $spacingUnit;
+}

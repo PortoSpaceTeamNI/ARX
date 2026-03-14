@@ -1,0 +1,75 @@
+@use '../../styles/main.scss' as *;
+
+.button {
+    &.sizeDefault {
+        padding: spacing(2) spacing(4);
+    }
+
+    &.xs {
+        padding: spacing(1) spacing(2);
+        font-size: spacing(3);
+        line-height: spacing(3);
+    }
+
+    &.icon {
+        min-width: spacing(9);
+        min-height: spacing(9);
+        padding: spacing(2);
+
+        svg {
+            display: block;
+            filter: $colorNeutral200Filter;
+        }
+    }
+
+    &.iconLg {
+        min-width: spacing(10);
+        min-height: spacing(10);
+        padding: spacing(2.5);
+
+        svg {
+            display: block;
+            filter: $colorNeutral200Filter;
+        }
+    }
+
+    &.outline {
+        background-color: $colorNeutral900;
+        @include border(1px, $colorNeutral700);
+
+        color: $colorNeutral50;
+
+        &:hover, &:active {
+            background-color: $colorNeutral800;
+        }
+
+        &:focus-visible {
+            @include outline(3px, $colorNeutral700);
+        }
+    }
+
+    &.ghost {
+        background-color: transparent;
+        border: none;
+
+        &:hover, &:active {
+            background-color: $colorNeutral800;
+        }
+
+        &:focus-visible {
+            @include outline(3px, $colorNeutral700);
+        }
+    }
+
+    &.destructive {
+        background-color: $colorRed600;
+        border: none;
+
+        color: $colorNeutral50;
+        font-weight: $fontSemibold;
+
+        &:focus-visible {
+            @include outline(3px, $colorRed300);
+        }
+    }
+}

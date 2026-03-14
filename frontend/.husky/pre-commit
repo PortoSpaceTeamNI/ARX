@@ -1,0 +1,9 @@
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^frontend/' || true)
+
+# If no frontend files changed, skip lint
+if [ -z "$FILES" ]; then
+  exit 0
+fi
+
+cd frontend
+docker compose --profile test run --rm frontend-test npm run lint

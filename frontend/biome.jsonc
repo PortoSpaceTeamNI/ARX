@@ -1,0 +1,56 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "defaultBranch": "main",
+    "useIgnoreFile": true
+  },
+
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [":PACKAGE:", ":BLANK_LINE:", "@/**", ":BLANK_LINE:"]
+          }
+        }
+      }
+    }
+  },
+
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space", // Uses spaces instead of tabs (standard for React)
+    "indentWidth": 2, // 2 spaces per indentation level
+    "lineEnding": "lf"
+  },
+
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true, // Enables the baseline safe rules
+
+      "correctness": {
+        "useExhaustiveDependencies": "error", // Ensures you don't miss variables in dependency array
+        "useHookAtTopLevel": "error" // Ensures hooks are not inside loops or conditions
+      },
+
+      "style": {
+        "useSelfClosingElements": "error", // Enforces <div /> instead of <div></div> when empty
+        "useConst": "error" // Forces 'const' if a variable is never reassigned
+      }
+    }
+  },
+
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single", // Use 'single' quotes for standard JS strings
+      "jsxQuoteStyle": "double", // Use "double" quotes for JSX attributes (standard HTML style)
+      "trailingCommas": "es5", // Adds trailing commas for cleaner git diffs
+      "semicolons": "always" // Always add semicolons
+    }
+  }
+}

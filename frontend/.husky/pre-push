@@ -1,0 +1,3 @@
+cd frontend
+docker compose --profile test run --rm frontend-test npm run test
+docker compose --profile test run --rm frontend-test npm run build

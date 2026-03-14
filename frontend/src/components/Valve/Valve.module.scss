@@ -1,0 +1,49 @@
+@use '../../styles/main.scss' as *;
+
+.valve {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: spacing(1);
+
+    width: fit-content;
+    background-color: $colorNeutral300;
+    padding: spacing(0.5);
+    @include border(1px, $colorNeutral700, spacing(8));
+
+    .closeButton {
+        aspect-ratio: 1 / 1;
+        width: fit-content;
+        padding: spacing(0.5);
+        border-radius: 50%;
+
+        @include text(spacing(2), spacing(2));
+    }
+
+    .openButton {
+        aspect-ratio: 1 / 1;
+        width: fit-content;
+        padding: spacing(0.5);
+        border-radius: 50%;
+
+        @include text(spacing(2), spacing(2));
+    }
+
+    .closed {
+        @include outline(2px, $colorRed600);
+    }
+
+    .opened {
+        @include outline(2px, $colorLime500);
+    }
+
+    .stateTransition {
+        @include outline(2px, $colorYellow200);
+    }
+}
+
+.valveName {
+    font-family: $fontFamily;
+    @include text(spacing(4), spacing(4), $fontRegular, $colorNeutral300);
+    padding: spacing(1) spacing(2);
+    backdrop-filter: blur(20px);
+}

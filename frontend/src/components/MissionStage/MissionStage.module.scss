@@ -1,0 +1,50 @@
+@use '../../styles/main.scss' as *;
+
+.missionStageGroup {
+    @include flex(row, center, stretch, spacing(4));
+    height: 100%;
+
+    .stageSlot {
+        flex: 1 1 auto;
+
+        @include flex(row, center, center);
+        container-type: size;
+
+        .stage {
+            @include border(1px, $colorNeutral700, 50%);
+            @include flex(row, center, center);
+            aspect-ratio: 1 / 1;
+
+            width: 100cqmin;
+            height: 100cqmin;
+            padding: spacing(4);
+
+            text-align: center;
+            color: $colorNeutral400;
+
+            &.complete {
+                @include border(1px, $colorNeutral200, 50%);
+                color: $colorNeutral200;
+            }
+
+            &.current {
+                background-color: $colorNeutral50;
+                color: $colorNeutral950;
+                font-weight: $fontSemibold;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .stageSeparator {
+        flex: 0 0 spacing(4);
+        align-self: center;
+
+        height: 2px;
+        background-color: $colorNeutral700;
+
+        &.complete {
+            background-color: $colorNeutral300;
+        }
+    }
+}

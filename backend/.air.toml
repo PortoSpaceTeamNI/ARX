@@ -1,0 +1,5 @@
+[build]
+  entrypoint = "bin/main"
+  cmd = "go build -o bin/main main.go"
+  include = ["*.go"]
+  exclude = ["bin"]
