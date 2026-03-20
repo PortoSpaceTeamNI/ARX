@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Pause, Play, Square } from 'lucide-react';
 import { Group, Panel } from 'react-resizable-panels';
 
@@ -14,6 +15,32 @@ import styles from './FillingPage.module.scss';
 
 export default function FillingPage() {
   const telemetry = useMissionControl((state) => state.telemetry);
+  const serialStatus = useMissionControl((state) => state.serialStatus);
+  const requestSerialPorts = useMissionControl((state) => state.requestSerialPorts);
+  const connectSerial = useMissionControl((state) => state.connectSerial);
+  const disconnectSerial = useMissionControl((state) => state.disconnectSerial);
+  const [selectedPort, setSelectedPort] = useState('');
+
+  const canConnect = useMemo(
+    () => selectedPort !== '' && (!serialStatus.connected || serialStatus.currentPort !== selectedPort),
+    [selectedPort, serialStatus.connected, serialStatus.currentPort]
+  );
+
+  useEffect(() => {
+    if (serialStatus.currentPort) {
+      setSelectedPort(serialStatus.currentPort);
+      return;
+    }
+
+    if (serialStatus.ports.length > 0 && !serialStatus.ports.includes(selectedPort)) {
+      setSelectedPort(serialStatus.ports[0]);
+      return;
+    }
+
+    if (serialStatus.ports.length === 0 && selectedPort !== '') {
+      setSelectedPort('');
+    }
+  }, [serialStatus.currentPort, serialStatus.ports, selectedPort]);
 
   return (
     <main className={styles.fillingPage}>
@@ -21,7 +48,57 @@ export default function FillingPage() {
         <Panel defaultSize="20%">
           <Group orientation="horizontal" className={styles.group}>
             <Panel defaultSize="20%" className={styles.panel}>
-              OBC/FS State
+              <p className={styles.panelName}>SERIAL</p>
+              <div className={styles.serialControls}>
+                <select
+                  className={styles.serialSelect}
+                  value={selectedPort}
+                  onChange={(event) => setSelectedPort(event.target.value)}
+                >
+                  <option value="" disabled>
+                    {serialStatus.ports.length > 0 ? 'Select port' : 'No ports found'}
+                  </option>
+                  {serialStatus.ports.map((port) => (
+                    <option key={port} value={port}>
+                      {port}
+                    </option>
+                  ))}
+                </select>
+
+                <div className={styles.serialButtons}>
+                  <Button variant="outline" size="xs" onClick={requestSerialPorts}>
+                    Refresh
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    disabled={!canConnect}
+                    onClick={() => connectSerial(selectedPort)}
+                  >
+                    Connect
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    disabled={!serialStatus.connected}
+                    onClick={disconnectSerial}
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+
+                <p className={styles.serialStatusText}>
+                  {serialStatus.connected && serialStatus.currentPort
+                    ? `Connected: ${serialStatus.currentPort}`
+                    : 'Disconnected'}
+                </p>
+
+                {serialStatus.error && (
+                  <p className={styles.serialErrorText}>{serialStatus.error}</p>
+                )}
+              </div>
             </Panel>
 
             <Panel className={styles.panel}>

@@ -10,15 +10,15 @@ import (
 )
 
 func main() {
-	s, err := stream.NewSerialStream("/dev/ttyACM0", 115200)
-	if err != nil {
-		panic("Serial err: " + err.Error())
-	}
+	serialManager := stream.NewSerialManager(115200)
 	p := parser.NewParser()
 	mc := missioncontrol.NewMissionControl()
-	h := hub.NewHub()
+	h := hub.NewHub(serialManager)
+	serialManager.SetStatusCallback(func(status stream.SerialStatus) {
+		h.BroadcastJSON("serial_status", status)
+	})
 
-	go stream.Run(s)
+	go serialManager.Run()
 	go p.Run()
 	go mc.Run()
 	go h.Run()

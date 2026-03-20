@@ -1,4 +1,5 @@
 import type { WebCommand } from './models/command';
+import type { SerialStatus } from './models/serial';
 import type { Telemetry } from './models/telemetry';
 import { useMissionControl } from './store';
 
@@ -8,6 +9,10 @@ const MAX_RETRIES = 5;
 
 let ws: WebSocket | null = null;
 let reconnectAttempts = 0;
+
+type IncomingWebSocketMessage =
+  | { type: 'telemetry'; data: Telemetry }
+  | { type: 'serial_status'; data: SerialStatus };
 
 export function initWebSocket() {
   if (ws?.readyState === WebSocket.OPEN) {
@@ -21,12 +26,20 @@ export function initWebSocket() {
   ws.onopen = () => {
     console.log('connected');
     reconnectAttempts = 0;
+    useMissionControl.getState().requestSerialPorts();
   };
 
   ws.onmessage = (event) => {
-    const telemetry: Telemetry = JSON.parse(event.data);
-    console.log(telemetry);
-    useMissionControl.getState().updateTelemetry(telemetry);
+    const message: IncomingWebSocketMessage = JSON.parse(event.data);
+
+    if (message.type === 'telemetry') {
+      useMissionControl.getState().updateTelemetry(message.data);
+      return;
+    }
+
+    if (message.type === 'serial_status') {
+      useMissionControl.getState().updateSerialStatus(message.data);
+    }
   };
 
   ws.onclose = () => {

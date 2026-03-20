@@ -5,6 +5,7 @@ import (
 	"log"
 	"missioncontrol/backend/globals"
 	"missioncontrol/backend/models/command"
+	"missioncontrol/backend/stream"
 	"net/http"
 	"reflect"
 	"sync"
@@ -15,17 +16,28 @@ import (
 type Hub struct {
 	Mu            sync.Mutex
 	GroundStation *websocket.Conn
+	SerialManager *stream.SerialManager
 }
 
-func NewHub() *Hub {
-	return &Hub{}
+func NewHub(serialManager *stream.SerialManager) *Hub {
+	return &Hub{SerialManager: serialManager}
+}
+
+type OutgoingMessage struct {
+	Type string `json:"type"`
+	Data any    `json:"data"`
+}
+
+type SerialConnectMessage struct {
+	Port     string `json:"port"`
+	BaudRate int    `json:"baudRate"`
 }
 
 func (h *Hub) Run() {
 	defer close(globals.CommandChannel)
 
 	for data := range globals.TelemetryChannel {
-		msg, err := json.Marshal(data)
+		msg, err := json.Marshal(OutgoingMessage{Type: "telemetry", Data: data})
 		if err != nil {
 			log.Printf("Error marshaling telemetry: %v", err)
 			continue
@@ -33,6 +45,16 @@ func (h *Hub) Run() {
 
 		h.Broadcast(msg)
 	}
+}
+
+func (h *Hub) BroadcastJSON(messageType string, data any) {
+	msg, err := json.Marshal(OutgoingMessage{Type: messageType, Data: data})
+	if err != nil {
+		log.Printf("Error marshaling %s message: %v", messageType, err)
+		return
+	}
+
+	h.Broadcast(msg)
 }
 
 func (h *Hub) Broadcast(msg []byte) {
@@ -59,7 +81,7 @@ var upgrader = websocket.Upgrader{
 func (h *Hub) WSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Upgrade error: %v", err)
+		log.Printf("Upgrade error: %v", err)
 		return
 	}
 
@@ -69,6 +91,8 @@ func (h *Hub) WSHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	h.GroundStation = conn
 	h.Mu.Unlock()
+
+	h.broadcastSerialStatus("")
 
 	defer func() {
 		h.Mu.Lock()
@@ -82,7 +106,7 @@ func (h *Hub) WSHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		messageType, payload, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Read error: %v", err)
+			log.Printf("Read error: %v", err)
 			break
 		}
 
@@ -90,19 +114,65 @@ func (h *Hub) WSHandler(w http.ResponseWriter, r *http.Request) {
 			var wc command.WebCommand
 
 			if err := json.Unmarshal(payload, &wc); err != nil {
-				log.Println("Failed to parse command envelope: %v", err)
+				log.Printf("Failed to parse command envelope: %v", err)
+				continue
+			}
+
+			switch wc.Type {
+			case "list_serial_ports":
+				h.broadcastSerialStatus("")
+				continue
+
+			case "connect_serial":
+				if h.SerialManager == nil {
+					continue
+				}
+
+				var connectMsg SerialConnectMessage
+				if err := json.Unmarshal(wc.Data, &connectMsg); err != nil {
+					log.Printf("Failed to parse connect_serial data: %v", err)
+					h.broadcastSerialStatus("Invalid connect_serial payload")
+					continue
+				}
+
+				if connectMsg.Port == "" {
+					h.broadcastSerialStatus("Serial port is required")
+					continue
+				}
+
+				if err := h.SerialManager.Connect(connectMsg.Port, connectMsg.BaudRate); err != nil {
+					log.Printf("Failed to connect serial port %s: %v", connectMsg.Port, err)
+					h.broadcastSerialStatus(err.Error())
+					continue
+				}
+
+				h.broadcastSerialStatus("")
+				continue
+
+			case "disconnect_serial":
+				if h.SerialManager == nil {
+					continue
+				}
+
+				if err := h.SerialManager.Disconnect(); err != nil {
+					log.Printf("Failed to disconnect serial port: %v", err)
+					h.broadcastSerialStatus(err.Error())
+					continue
+				}
+
+				h.broadcastSerialStatus("")
 				continue
 			}
 
 			t, exists := command.CommandRegistry[wc.Type]
 			if !exists {
-				log.Println("Unknown command type: %s", wc.Type)
+				log.Printf("Unknown command type: %s", wc.Type)
 				continue
 			}
 
 			cmd := reflect.New(t).Interface().(command.ICommand)
 			if err := json.Unmarshal(wc.Data, cmd); err != nil {
-				log.Println("Failed to parse command data for %s: %v", wc.Type, err)
+				log.Printf("Failed to parse command data for %s: %v", wc.Type, err)
 				continue
 			}
 
@@ -111,4 +181,17 @@ func (h *Hub) WSHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+}
+
+func (h *Hub) broadcastSerialStatus(errorMessage string) {
+	if h.SerialManager == nil {
+		return
+	}
+
+	status := h.SerialManager.GetStatus()
+	if errorMessage != "" {
+		status.Error = errorMessage
+	}
+
+	h.BroadcastJSON("serial_status", status)
 }

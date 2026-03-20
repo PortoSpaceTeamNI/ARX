@@ -1,13 +1,19 @@
 import { create } from 'zustand';
 
 import { MissionState } from './models/missionstate';
+import type { SerialStatus } from './models/serial';
 import type { Telemetry } from './models/telemetry';
 import { type ValveID, ValveState } from './models/valve';
 import { sendMessage } from './webSocketManager';
 
 type MissionControlState = {
   telemetry: Telemetry;
+  serialStatus: SerialStatus;
   updateTelemetry: (newTelemetry: Telemetry) => void;
+  updateSerialStatus: (newSerialStatus: SerialStatus) => void;
+  requestSerialPorts: () => void;
+  connectSerial: (port: string) => void;
+  disconnectSerial: () => void;
   openValve: (valve: ValveID) => void;
   closeValve: (valve: ValveID) => void;
 };
@@ -100,8 +106,34 @@ export const useMissionControl = create<MissionControlState>()((set) => ({
       },
     },
   },
+  serialStatus: {
+    ports: [],
+    connected: false,
+  },
   updateTelemetry: (newTelemetry: Telemetry) =>
     set({ telemetry: newTelemetry }),
+  updateSerialStatus: (newSerialStatus: SerialStatus) =>
+    set({ serialStatus: newSerialStatus }),
+  requestSerialPorts: () => {
+    sendMessage({
+      type: 'list_serial_ports',
+      data: {},
+    });
+  },
+  connectSerial: (port: string) => {
+    sendMessage({
+      type: 'connect_serial',
+      data: {
+        port: port,
+      },
+    });
+  },
+  disconnectSerial: () => {
+    sendMessage({
+      type: 'disconnect_serial',
+      data: {},
+    });
+  },
   openValve: (valve: ValveID, duration?: number) => {
     sendMessage({
       type: 'update_valve',

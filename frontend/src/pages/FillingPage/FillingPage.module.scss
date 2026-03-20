@@ -33,6 +33,32 @@
         }
     }
 
+    .serialControls {
+        @include flex(column, flex-start, stretch, spacing(2));
+        margin-top: spacing(2);
+
+        .serialSelect {
+            @include border(1px, $colorNeutral700, spacing(1));
+            background-color: $colorNeutral900;
+            color: $colorNeutral50;
+            padding: spacing(1) spacing(2);
+            font-family: $fontFamily;
+        }
+
+        .serialButtons {
+            @include flex(row, flex-start, center, spacing(1));
+            flex-wrap: wrap;
+        }
+
+        .serialStatusText {
+            @include text($size: spacing(3), $color: $colorNeutral300);
+        }
+
+        .serialErrorText {
+            @include text($size: spacing(3), $color: $colorRed300);
+        }
+    }
+
     .fillingStageContainer {
         @include flex(row, center, center);
         position: relative;
