@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { LogCommand } from './models/command';
 import { MissionState } from './models/missionstate';
 import type { Telemetry } from './models/telemetry';
 import { type ValveID, ValveState } from './models/valve';
@@ -14,6 +15,8 @@ type MissionControlState = {
   openValve: (valve: ValveID) => void;
   closeValve: (valve: ValveID) => void;
   updateSerialPort: (serialPort: string) => void;
+  startLocalLog: () => void;
+  stopLocalLog: () => void;
 };
 
 export const useMissionControl = create<MissionControlState>()((set) => ({
@@ -170,6 +173,22 @@ export const useMissionControl = create<MissionControlState>()((set) => ({
       type: 'update_serial_port',
       data: {
         serial_port: serialPort,
+      },
+    });
+  },
+  startLocalLog: () => {
+    sendMessage({
+      type: 'local_log',
+      data: {
+        command: LogCommand.Start,
+      },
+    });
+  },
+  stopLocalLog: () => {
+    sendMessage({
+      type: 'local_log',
+      data: {
+        command: LogCommand.Stop,
       },
     });
   },

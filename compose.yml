@@ -31,11 +31,10 @@ services:
     build:
       context: backend
       target: dev
+    privileged: true
     volumes:
       - ./backend:/app
       - /dev:/dev
     ports:
       - "8080:8080"
-    devices:
-      - "/dev:/dev"
     profiles: ["dev"]

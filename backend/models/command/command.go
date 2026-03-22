@@ -22,7 +22,15 @@ func init() {
 
 	register("update_valve", &UpdateValveCommand{})
 	register("update_serial_port", &UpdateSerialPortCommand{})
+	register("local_log", &LocalLogCommand{})
 }
+
+type LogAction int
+
+const (
+	LogStart LogAction = iota
+	LogStop
+)
 
 type ICommand interface {
 	ToString() string

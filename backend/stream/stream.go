@@ -1,10 +1,13 @@
 package stream
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"missioncontrol/backend/globals"
 	"missioncontrol/backend/models/command"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -19,6 +22,7 @@ type StreamManager struct {
 	mu            sync.RWMutex
 	activePort    serial.Port
 	currentConfig *serial.Mode
+	logFile       *os.File
 }
 
 func NewStreamManager() *StreamManager {
@@ -47,6 +51,55 @@ func (m *StreamManager) OpenPort(portName string, baud int) error {
 	return nil
 }
 
+func (m *StreamManager) StartLogging() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.logFile != nil {
+		return nil
+	}
+
+	logDir := "log"
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		return fmt.Errorf("could not create log directory: %w", err)
+	}
+
+	fileName := time.Now().Format("log_02_01_2006_150405") + ".bin"
+	fullPath := filepath.Join(logDir, fileName)
+
+	f, err := os.Create(fullPath)
+	if err != nil {
+		return err
+	}
+
+	m.logFile = f
+	log.Printf("Started local binary logging to: %s", fileName)
+	return nil
+}
+
+func (m *StreamManager) StopLogging() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.logFile != nil {
+		m.logFile.Close()
+		m.logFile = nil
+		log.Println("Stopped local binary logging.")
+	}
+}
+
+func (m *StreamManager) WriteToLog(data []byte) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if m.logFile != nil {
+		_, err := m.logFile.Write(data)
+		if err != nil {
+			log.Printf("Logging error: %v", err)
+		}
+	}
+}
+
 func (m *StreamManager) Run() {
 	go func() {
 		buf := make([]byte, 256)
@@ -64,6 +117,7 @@ func (m *StreamManager) Run() {
 			if n > 0 {
 				data := make([]byte, n)
 				copy(data, buf[:n])
+				m.WriteToLog(data)
 				globals.ByteChannel <- data
 			}
 
@@ -82,6 +136,7 @@ func (m *StreamManager) Run() {
 					pkt := req.ToPacket()
 					bytes := pkt.ToBytes()
 
+					m.WriteToLog(bytes)
 					_, err := m.activePort.Write(bytes)
 					if err != nil {
 						log.Printf("Write error: %v", err)
@@ -91,11 +146,18 @@ func (m *StreamManager) Run() {
 
 			} else {
 				if portCmd, ok := req.(*command.UpdateSerialPortCommand); ok {
-					newPort := portCmd.SerialPort
-
-					err := m.OpenPort(newPort, 115200)
+					err := m.OpenPort(portCmd.SerialPort, 115200)
 					if err != nil {
-						log.Printf("Failed to switch to %s: %v", newPort, err)
+						log.Printf("Failed to switch to %s: %v", portCmd.SerialPort, err)
+					}
+
+				} else if logCmd, ok := req.(*command.LocalLogCommand); ok {
+					if logCmd.Command == command.LogStart {
+						if err := m.StartLogging(); err != nil {
+							log.Printf("Failed to start log: %v", err)
+						}
+					} else {
+						m.StopLogging()
 					}
 				}
 			}

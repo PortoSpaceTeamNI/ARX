@@ -16,4 +16,21 @@ export type UpdateSerialPortCommand = {
   };
 };
 
-export type WebCommand = UpdateValveCommand | UpdateSerialPortCommand;
+export const LogCommand = {
+  Start: 0,
+  Stop: 1,
+} as const;
+
+export type LogCommand = (typeof LogCommand)[keyof typeof LogCommand];
+
+export type LocalLogCommand = {
+  type: 'local_log';
+  data: {
+    command: LogCommand;
+  };
+};
+
+export type WebCommand =
+  | UpdateValveCommand
+  | UpdateSerialPortCommand
+  | LocalLogCommand;

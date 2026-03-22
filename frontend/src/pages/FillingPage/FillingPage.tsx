@@ -1,4 +1,4 @@
-import { Pause, Play, Square } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { useLayoutEffect, useRef } from 'react';
 import { Group, Panel } from 'react-resizable-panels';
 
@@ -18,6 +18,8 @@ export default function FillingPage() {
   const telemetry = useMissionControl((state) => state.telemetry);
   const log = useMissionControl((state) => state.log);
   const updateSerialPort = useMissionControl((state) => state.updateSerialPort);
+  const startLocalLog = useMissionControl((state) => state.startLocalLog);
+  const stopLocalLog = useMissionControl((state) => state.stopLocalLog);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -64,14 +66,11 @@ export default function FillingPage() {
               defaultSize="20%"
               className={`${styles.panel} ${styles.fillingStageControls}`}
             >
-              <Button variant="ghost" size="iconLg">
-                <Pause />
-              </Button>
-              <Button variant="ghost" size="iconLg">
-                <Square />
-              </Button>
-              <Button variant="ghost" size="iconLg">
+              <Button variant="ghost" size="iconLg" onClick={startLocalLog}>
                 <Play />
+              </Button>
+              <Button variant="ghost" size="iconLg" onClick={stopLocalLog}>
+                <Square />
               </Button>
             </Panel>
           </Group>
