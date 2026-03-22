@@ -5,15 +5,25 @@ import type { Telemetry } from './models/telemetry';
 import { type ValveID, ValveState } from './models/valve';
 import { sendMessage } from './webSocketManager';
 
+const MAX_LOG_SIZE = 100;
+
 type MissionControlState = {
+  log: { timestamp: number; info: string; nRepeated: number }[];
   telemetry: Telemetry;
   updateTelemetry: (newTelemetry: Telemetry) => void;
   openValve: (valve: ValveID) => void;
   closeValve: (valve: ValveID) => void;
+  updateSerialPort: (serialPort: string) => void;
 };
 
 export const useMissionControl = create<MissionControlState>()((set) => ({
+  log: [],
   telemetry: {
+    packetLoss: 0,
+    latency: 0,
+    dataRate: 0,
+    commandLog: '',
+    availablePorts: [],
     status: {
       obc: {
         state: MissionState.Idle,
@@ -101,7 +111,40 @@ export const useMissionControl = create<MissionControlState>()((set) => ({
     },
   },
   updateTelemetry: (newTelemetry: Telemetry) =>
-    set({ telemetry: newTelemetry }),
+    set((state) => {
+      const safeStatus = newTelemetry.status ?? state.telemetry.status;
+
+      const newCommand = newTelemetry.commandLog;
+      let nextLog = [...state.log];
+
+      if (newCommand) {
+        const lastEntry = nextLog[nextLog.length - 1];
+        if (lastEntry && lastEntry.info === newCommand) {
+          nextLog[nextLog.length - 1] = {
+            ...lastEntry,
+            nRepeated: lastEntry.nRepeated + 1,
+          };
+        } else {
+          nextLog.push({
+            timestamp: Date.now(),
+            info: newCommand,
+            nRepeated: 1,
+          });
+        }
+
+        if (nextLog.length > MAX_LOG_SIZE) {
+          nextLog = nextLog.slice(-MAX_LOG_SIZE);
+        }
+      }
+
+      return {
+        log: nextLog,
+        telemetry: {
+          ...newTelemetry,
+          status: safeStatus,
+        },
+      };
+    }),
   openValve: (valve: ValveID, duration?: number) => {
     sendMessage({
       type: 'update_valve',
@@ -119,6 +162,14 @@ export const useMissionControl = create<MissionControlState>()((set) => ({
         valve: valve,
         state: ValveState.Closed,
         duration: duration ? duration : undefined,
+      },
+    });
+  },
+  updateSerialPort: (serialPort: string) => {
+    sendMessage({
+      type: 'update_serial_port',
+      data: {
+        serial_port: serialPort,
       },
     });
   },

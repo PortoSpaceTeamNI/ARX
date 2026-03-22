@@ -1,0 +1,67 @@
+@use '../../styles/main.scss' as *;
+
+.field {
+    @include flex(row, space-between, center);
+
+    .label {
+        text-wrap: nowrap;
+        color: $colorNeutral300;
+    }
+
+    .select {
+        @include flex(row, space-between, center, spacing(1));
+        min-width: 8rem;
+        width: fit-content;
+        padding: spacing(1) 0 spacing(1) spacing(1);
+        @include border(1px, $colorNeutral700);
+        outline: 0;
+
+        background-color: $colorNeutral900;
+        color: $colorNeutral200;
+
+        &:hover {
+            background-color: $colorNeutral800;
+        }
+
+        .value[data-placeholder] {
+            opacity: 0.6;
+        }
+
+        .icon {
+            display: flex;
+            filter: $colorNeutral500Filter;
+        }
+    }
+
+}
+
+.positioner {
+    .popup {
+        min-width: var(--anchor-width);
+        transition: transform 150ms, opacity 150ms;
+        outline: 0;
+        font-family: $fontFamily;
+
+        &[data-starting-style],
+        &[data-ending-style] {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .list {
+            background-color: $colorNeutral900;
+            @include border(1px, $colorNeutral700);
+
+            .item {
+                outline: 0;
+                padding: spacing(1);
+                color: $colorNeutral300;
+
+                &:hover {
+                    background-color: $colorNeutral200;
+                    color: $colorNeutral900;
+                }
+            }
+        }
+    }
+}

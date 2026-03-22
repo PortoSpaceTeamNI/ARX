@@ -2,8 +2,9 @@ import type { MissionState } from './missionstate';
 import type { ValveState } from './valve';
 
 export type Telemetry = {
-  latency: number,
-  dataRate: number,
+  packetLoss: number;
+  latency: number;
+  dataRate: number;
   status: {
     obc: OBC;
     hydraUf: HydraUF;
@@ -14,6 +15,8 @@ export type Telemetry = {
     liftR: LiftR;
     liftFs: LiftFS;
   };
+  commandLog: string;
+  availablePorts: string[];
 };
 
 type OBC = {

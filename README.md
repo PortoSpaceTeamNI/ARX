@@ -1,0 +1,5 @@
+- Grafana
+- Escolha dos Serial Ports
+    - Era interessante ter uma função que percoresse os serial ports e tentasse encontrar o válido
+- Mudar frontend para Dockview
+- Poder começar um log no frontend

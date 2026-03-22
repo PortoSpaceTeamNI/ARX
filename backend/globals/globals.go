@@ -9,8 +9,8 @@ import (
 const (
 	RsByteTimeout     time.Duration = 1000 * time.Millisecond
 	HeartbeatInterval time.Duration = 1000 * time.Millisecond
-	PacketTimeout     time.Duration = 1000 * time.Millisecond
-	DoubtTimeout      time.Duration = 10 * time.Second // TODO: Doubt state
+	CommandTimeout    time.Duration = 1000 * time.Millisecond
+	DoubtInterval     time.Duration = 10 * time.Second // TODO: Doubt state
 )
 
 // Communication Channels
@@ -28,4 +28,4 @@ var CommandChannel chan command.ICommand = make(chan command.ICommand, 100)
 var TelemetryChannel chan telemetry.Telemetry = make(chan telemetry.Telemetry, 100)
 
 // MissionControl -> Stream
-var RequestChannel chan []byte = make(chan []byte, 100)
+var RequestChannel chan command.ICommand = make(chan command.ICommand, 100)

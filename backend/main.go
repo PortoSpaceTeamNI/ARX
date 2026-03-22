@@ -10,15 +10,12 @@ import (
 )
 
 func main() {
-	s, err := stream.NewSerialStream("/dev/ttyACM0", 115200)
-	if err != nil {
-		panic("Serial err: " + err.Error())
-	}
+	s := stream.NewStreamManager()
 	p := parser.NewParser()
 	mc := missioncontrol.NewMissionControl()
 	h := hub.NewHub()
 
-	go stream.Run(s)
+	go s.Run()
 	go p.Run()
 	go mc.Run()
 	go h.Run()

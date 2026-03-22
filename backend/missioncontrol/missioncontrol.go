@@ -9,13 +9,17 @@ import (
 	"missioncontrol/backend/models/valve"
 	"missioncontrol/backend/models/valve/valvestate"
 	"time"
+
+	"go.bug.st/serial"
 )
 
 type MissionControl struct {
+	CommandQueue  []command.ICommand
+	PendingValves map[valve.Valve]valvestate.ValveState
+	Telemetry     telemetry.Telemetry
+
+	CurrentSerialPort   serial.Port // TODO: Track this so the state comes from the backend. We could also have a startup function that sends a status to every available serial port and if it gets a response it chooses it
 	CurrentCommand      command.ICommand
-	CommandQueue        []command.ICommand
-	PendingValves       map[valve.Valve]valvestate.ValveState
-	Telemetry           telemetry.Telemetry
 	LastCommandSentTime time.Time
 }
 
@@ -29,8 +33,11 @@ func (mc *MissionControl) Run() {
 	defer close(globals.TelemetryChannel)
 	defer close(globals.RequestChannel)
 
-	heartbeat := time.NewTicker(globals.HeartbeatInterval)
-	defer heartbeat.Stop()
+	heartbeatTicker := time.NewTicker(globals.HeartbeatInterval)
+	defer heartbeatTicker.Stop()
+
+	timeoutTicker := time.NewTicker(globals.CommandTimeout)
+	defer timeoutTicker.Stop()
 
 	for {
 		select {
@@ -53,8 +60,12 @@ func (mc *MissionControl) Run() {
 				mc.CommandQueue = append(mc.CommandQueue, cmd)
 			}
 
-		case <-heartbeat.C:
-			mc.OnTick()
+		case <-heartbeatTicker.C:
+			mc.Telemetry.AvailablePorts, _ = serial.GetPortsList()
+			mc.Heartbeat()
+
+		case <-timeoutTicker.C:
+			mc.CheckTimeout()
 		}
 	}
 }
@@ -66,7 +77,9 @@ func (mc *MissionControl) HandleResponse(res command.Response) {
 	}
 
 	mc.Telemetry.Latency = float64(res.SyncByteTime.Sub(mc.LastCommandSentTime).Microseconds()) / 1e3
-	mc.Telemetry.CommandLog = fmt.Sprintf("[RCV]: %s", mc.CurrentCommand.ToString())
+	//if mc.CurrentCommand != nil {
+	mc.Telemetry.CommandLog = fmt.Sprintf("[RCV]: %s Ack", mc.CurrentCommand.ToString())
+	//}
 
 	switch r := res.Data.(type) {
 	case command.ParsedManualExecResponse: // TODO: This implementation assumes that, when currentCommand has a response type of ManualExec then the first received response will be relative to that command, which migh not be the case
@@ -105,41 +118,30 @@ func (mc *MissionControl) HandleResponse(res command.Response) {
 	mc.HandleQueue()
 }
 
-func (mc *MissionControl) HandleCommand(cmd command.ICommand) {
-	if valveCmd, ok := cmd.(*command.UpdateValveCommand); ok {
-		switch valveCmd.State {
-		case valvestate.Closed:
-			mc.PendingValves[valveCmd.Valve] = valvestate.ClosingNotAcked
-
-		case valvestate.Opened:
-			mc.PendingValves[valveCmd.Valve] = valvestate.OpeningNotAcked
-		}
-	}
-
-	mc.CurrentCommand = cmd
-
-	pkt := cmd.ToPacket()
-	bytes := pkt.ToBytes()
-
+func (mc *MissionControl) sendCommand(cmd command.ICommand) {
 	log.Printf("Sending %s command", cmd.ToString())
 
 	mc.LastCommandSentTime = time.Now()
 
-	globals.RequestChannel <- bytes
+	globals.RequestChannel <- cmd
 }
 
-func (mc *MissionControl) OnTick() {
-	if mc.CurrentCommand != nil {
-		return
+func (mc *MissionControl) HandleCommand(cmd command.ICommand) {
+	if cmd.IsRemote() {
+		if valveCmd, ok := cmd.(*command.UpdateValveCommand); ok {
+			switch valveCmd.State {
+			case valvestate.Closed:
+				mc.PendingValves[valveCmd.Valve] = valvestate.ClosingNotAcked
+
+			case valvestate.Opened:
+				mc.PendingValves[valveCmd.Valve] = valvestate.OpeningNotAcked
+			}
+		}
+
+		mc.CurrentCommand = cmd
 	}
 
-	if len(mc.CommandQueue) > 0 {
-		mc.HandleQueue()
-		return
-	}
-
-	//log.Println("Sending status command")
-	mc.HandleCommand(&command.StatusCommand{})
+	mc.sendCommand(cmd)
 }
 
 func (mc *MissionControl) HandleQueue() {
@@ -153,33 +155,52 @@ func (mc *MissionControl) HandleQueue() {
 	mc.HandleCommand(nextCmd)
 }
 
-/*func (mc *MissionControl) resolveValvesState(data *command.ParsedStatusResponse) {
-	resolveValve := func(valve valve.Valve, currentState *valvestate.ValveState) {
-		pendingState, isPending := mc.PendingValves[valve]
-		if !isPending {
-			return
-		}
+func (mc *MissionControl) Heartbeat() {
+	if mc.CurrentCommand != nil {
+		return
+	}
 
-		if (pendingState == valvestate.Opening && *currentState == valvestate.Opened) || // Valve has reached the desired state so we remove it from the map
-			(pendingState == valvestate.Closing && *currentState == valvestate.Closed) {
-			delete(mc.PendingValves, valve)
+	if len(mc.CommandQueue) > 0 {
+		mc.HandleQueue()
+		return
+	}
 
-		} else { // Valve hasn't reached the desired state so we overwrite the data with the pending state
-			*currentState = pendingState
+	//log.Println("Sending status command")
+	mc.HandleCommand(&command.StatusCommand{})
+}
+
+func (mc *MissionControl) CheckTimeout() {
+	if mc.CurrentCommand == nil || time.Since(mc.LastCommandSentTime) <= globals.CommandTimeout {
+		return
+	}
+
+	portCmdIndex := -1
+	for i, cmd := range mc.CommandQueue {
+		if _, ok := cmd.(*command.UpdateSerialPortCommand); ok {
+			portCmdIndex = i
+			break
 		}
 	}
 
-	resolveValve(valve.Pressurizing, &data.HydraUF.PressurizingValve)
-	resolveValve(valve.Vent, &data.HydraUF.VentValve)
+	if portCmdIndex != -1 {
+		log.Println("Timeout: Jumping queue with Port Update")
 
-	resolveValve(valve.Abort, &data.HydraLF.AbortValve)
-	resolveValve(valve.Main, &data.HydraLF.MainValve)
+		portCmd := mc.CommandQueue[portCmdIndex]
+		mc.CommandQueue = append(mc.CommandQueue[:portCmdIndex], mc.CommandQueue[portCmdIndex+1:]...)
 
-	resolveValve(valve.N2OFill, &data.HydraFS.N2O.FillValve)
-	resolveValve(valve.N2OPurge, &data.HydraFS.N2O.PurgeValve)
-	resolveValve(valve.N2Fill, &data.HydraFS.N2.FillValve)
-	resolveValve(valve.N2Purge, &data.HydraFS.N2.PurgeValve)
-	resolveValve(valve.N2OQuickDc, &data.HydraFS.QuickDC.N2OValve)
-	resolveValve(valve.N2QuickDc, &data.HydraFS.QuickDC.N2Valve)
+		globals.RequestChannel <- portCmd
+
+		mc.Telemetry.CommandLog = "[SYS]: Attempting rescue port swap"
+		globals.TelemetryChannel <- mc.Telemetry
+
+		return
+	}
+
+	log.Println("Retrying command")
+	mc.Telemetry.PacketLoss++
+	mc.Telemetry.Latency = 0
+	mc.Telemetry.CommandLog = fmt.Sprintf("[ERROR]: Retrying %s", mc.CurrentCommand.ToString())
+	globals.TelemetryChannel <- mc.Telemetry
+
+	mc.sendCommand(mc.CurrentCommand)
 }
-*/

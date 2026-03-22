@@ -6,7 +6,6 @@ import (
 	"missioncontrol/backend/models/packet/commandid"
 	"missioncontrol/backend/models/packet/communicatorid"
 	"missioncontrol/backend/models/packet/payload"
-	"missioncontrol/backend/models/valve"
 	"missioncontrol/backend/models/valve/valvestate"
 )
 
@@ -124,43 +123,9 @@ type Elytra struct {
 	MainChuteEmatch   bool `json:"mainChuteEmatch"`
 }
 
-func (sr *ParsedStatusResponse) GetValveState(v valve.Valve) valvestate.ValveState {
-	switch v {
-	case valve.Pressurizing:
-		return sr.HydraUF.PressurizingValve
-
-	case valve.Vent:
-		return sr.HydraUF.VentValve
-
-	case valve.Abort:
-		return sr.HydraLF.AbortValve
-
-	case valve.Main:
-		return sr.HydraLF.MainValve
-
-	case valve.N2OFill:
-		return sr.HydraFS.N2O.FillValve
-
-	case valve.N2OPurge:
-		return sr.HydraFS.N2O.PurgeValve
-
-	case valve.N2Fill:
-		return sr.HydraFS.N2.FillValve
-
-	case valve.N2Purge:
-		return sr.HydraFS.N2.PurgeValve
-
-	case valve.N2OQuickDc:
-		return sr.HydraFS.QuickDC.N2OValve
-
-	case valve.N2QuickDc:
-		return sr.HydraFS.QuickDC.N2Valve
-	}
-
-	panic("Tried getting state of undefined valve")
+type StatusCommand struct {
+	RemoteCommand
 }
-
-type StatusCommand struct{}
 
 func (c *StatusCommand) ToString() string {
 	return "Status"

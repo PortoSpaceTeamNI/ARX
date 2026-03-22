@@ -9,4 +9,11 @@ export type UpdateValveCommand = {
   };
 };
 
-export type WebCommand = UpdateValveCommand;
+export type UpdateSerialPortCommand = {
+  type: 'update_serial_port';
+  data: {
+    serial_port: string;
+  };
+};
+
+export type WebCommand = UpdateValveCommand | UpdateSerialPortCommand;

@@ -21,13 +21,26 @@ func init() {
 	}
 
 	register("update_valve", &UpdateValveCommand{})
+	register("update_serial_port", &UpdateSerialPortCommand{})
 }
 
 type ICommand interface {
 	ToString() string
+	IsRemote() bool
+
 	ToPacket() packet.Packet
 	ParseResponse(p packet.Packet) (IResponse, error)
 }
+
+type RemoteCommand struct{}
+
+func (c *RemoteCommand) IsRemote() bool { return true }
+
+type LocalCommand struct{}
+
+func (c *LocalCommand) IsRemote() bool                                   { return false }
+func (c *LocalCommand) ToPacket() packet.Packet                          { return packet.Packet{} }
+func (c *LocalCommand) ParseResponse(p packet.Packet) (IResponse, error) { return nil, nil }
 
 type IResponse interface {
 	IsResponse()

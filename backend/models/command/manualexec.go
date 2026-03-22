@@ -10,7 +10,9 @@ import (
 	"missioncontrol/backend/models/valve/valvestate"
 )
 
-type ManualExecCommand struct{}
+type ManualExecCommand struct {
+	RemoteCommand
+}
 
 type ParsedManualExecResponse struct {
 	ManualExecCommandID byte

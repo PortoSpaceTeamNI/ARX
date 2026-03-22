@@ -15,7 +15,7 @@
 main {
   isolation: isolate;
   font-family: $fontFamily;
-  line-height: 100%;
+  line-height: 104%;
 
   height: 100dvh;
 
@@ -24,4 +24,8 @@ main {
 
 button {
   font-family: $fontFamily;
+}
+
+ul {
+  list-style: none;
 }
