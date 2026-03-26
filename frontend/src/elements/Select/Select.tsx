@@ -6,16 +6,18 @@ import styles from './Select.module.scss';
 
 type SelectProps = {
   label: string;
-  items: { label: string; value: string }[];
+  items: string[];
+  value: string;
   onValueChange: BaseSelect.Root.Props<string>['onValueChange'];
+  className?: string
 };
 
-export default function Select({ label, items, onValueChange }: SelectProps) {
+export default function Select({ label, items, value, onValueChange, className }: SelectProps) {
   const id = useId();
 
   return (
-    <div className={styles.field}>
-      <BaseSelect.Root id={id} onValueChange={onValueChange}>
+    <div className={`${styles.field} ${className}`}>
+      <BaseSelect.Root id={id} value={value} onValueChange={onValueChange}>
         <label htmlFor={id} className={styles.label}>
           {label}
         </label>
@@ -41,14 +43,14 @@ export default function Select({ label, items, onValueChange }: SelectProps) {
               <BaseSelect.ScrollUpArrow />
 
               <BaseSelect.List className={styles.list}>
-                {items.map(({ label, value }) => (
+                {items.map((item) => (
                   <BaseSelect.Item
-                    key={label}
-                    value={value}
+                    key={item}
+                    value={item}
                     className={styles.item}
                   >
                     <BaseSelect.ItemText className={styles.text}>
-                      {label}
+                      {item}
                     </BaseSelect.ItemText>
                   </BaseSelect.Item>
                 ))}

@@ -1,6 +1,6 @@
 import { Popover } from '@base-ui/react';
 
-import Button from '@/components/Button';
+import Button from '@/elements/Button';
 import { type ValveID, ValveNames, ValveState } from '@/utils/models/valve';
 import { useMissionControl } from '@/utils/store';
 

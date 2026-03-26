@@ -17,6 +17,7 @@ export type Telemetry = {
   };
   commandLog: string;
   availablePorts: string[];
+  currentPort: string;
 };
 
 type OBC = {

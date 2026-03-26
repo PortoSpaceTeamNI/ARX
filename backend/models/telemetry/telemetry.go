@@ -9,4 +9,5 @@ type Telemetry struct {
 	Status         *command.ParsedStatusResponse `json:"status"`
 	CommandLog     string                        `json:"commandLog"`
 	AvailablePorts []string                      `json:"availablePorts"`
+	CurrentPort    string                        `json:"currentPort"`
 }

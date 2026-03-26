@@ -12,7 +12,7 @@ import (
 func main() {
 	s := stream.NewStreamManager()
 	p := parser.NewParser()
-	mc := missioncontrol.NewMissionControl()
+	mc := missioncontrol.NewLiveMissionControl()
 	h := hub.NewHub()
 
 	go s.Run()

@@ -8,6 +8,7 @@ import (
 	"missioncontrol/backend/models/telemetry"
 	"missioncontrol/backend/models/valve"
 	"missioncontrol/backend/models/valve/valvestate"
+	"missioncontrol/backend/stream"
 	"time"
 
 	"go.bug.st/serial"
@@ -18,7 +19,6 @@ type MissionControl struct {
 	PendingValves map[valve.Valve]valvestate.ValveState
 	Telemetry     telemetry.Telemetry
 
-	CurrentSerialPort   serial.Port // TODO: Track this so the state comes from the backend. We could also have a startup function that sends a status to every available serial port and if it gets a response it chooses it
 	CurrentCommand      command.ICommand
 	LastCommandSentTime time.Time
 }
@@ -27,6 +27,27 @@ func NewMissionControl() *MissionControl {
 	return &MissionControl{
 		PendingValves: make(map[valve.Valve]valvestate.ValveState),
 	}
+}
+
+func NewLiveMissionControl() *MissionControl {
+	mc := NewMissionControl()
+
+	port, err := stream.FindAvailablePort()
+	if err != nil {
+		log.Printf("Mission Control initialized in IDLE mode: %v", err)
+
+	} else {
+		log.Printf("Valid Port Found: %s", port)
+
+		updateCmd := &command.UpdateSerialPortCommand{
+			SerialPort: port,
+		}
+
+		globals.RequestChannel <- updateCmd
+		mc.Telemetry.CurrentPort = port
+	}
+
+	return mc
 }
 
 func (mc *MissionControl) Run() {

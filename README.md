@@ -1,4 +1,4 @@
 - Grafana
 - Escolha dos Serial Ports
-    - Era interessante ter uma função que percoresse os serial ports e tentasse encontrar o válido
+    - Poder escolher o serial port automaticamente em qualquer altura ao invés de só no startup
 - Mudar frontend para Dockview
