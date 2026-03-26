@@ -9,10 +9,16 @@ type SelectProps = {
   items: string[];
   value: string;
   onValueChange: BaseSelect.Root.Props<string>['onValueChange'];
-  className?: string
+  className?: string;
 };
 
-export default function Select({ label, items, value, onValueChange, className }: SelectProps) {
+export default function Select({
+  label,
+  items,
+  value,
+  onValueChange,
+  className,
+}: SelectProps) {
   const id = useId();
 
   return (

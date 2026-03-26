@@ -3,11 +3,11 @@ import { useLayoutEffect, useRef } from 'react';
 import { Group, Panel } from 'react-resizable-panels';
 
 import fillingStationDiagram from '@/assets/fillingStationDiagram.png';
-import Button from '@/elements/Button';
 import MissionStageGroup from '@/components/MissionStage';
+import Valve from '@/components/Valve';
+import Button from '@/elements/Button';
 import Select from '@/elements/Select';
 import { Table, TableBody, TableCell, TableRow } from '@/elements/Table';
-import Valve from '@/components/Valve';
 import { MissionState, MissionStateNames } from '@/utils/models/missionstate';
 import { ValveID } from '@/utils/models/valve';
 import { useMissionControl } from '@/utils/store';
@@ -45,8 +45,14 @@ export default function FillingPage() {
                     onValueChange={(val) => val && updateSerialPort(val)}
                     className={styles.select}
                   />
-                  <Button variant='ghost' size='icon' onClick={() => {/*updateSerialPort("search") TODO: This*/}}>
-                    <Clover/>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      /*updateSerialPort("search") TODO: This*/
+                    }}
+                  >
+                    <Clover />
                   </Button>
                 </li>
               </ul>
