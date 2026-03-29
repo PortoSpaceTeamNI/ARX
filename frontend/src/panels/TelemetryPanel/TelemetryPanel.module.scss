@@ -1,0 +1,12 @@
+@use '../../styles/main.scss' as *;
+
+.telemetryTable {
+    .telemetryValue {
+        padding-right: 0.5rem !important;
+        text-align: right;
+    }
+
+    .telemetryUnit {
+        width: 1%;
+    }
+}

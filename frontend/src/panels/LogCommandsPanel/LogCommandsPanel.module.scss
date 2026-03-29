@@ -1,0 +1,11 @@
+@use '../../styles/main.scss' as *;
+
+.logCommandsPanel {
+    @include flex(row, space-evenly, center);
+    height: 100%;
+
+    svg {
+        width: spacing(10);
+        height: spacing(10);
+    }
+}

@@ -35,6 +35,7 @@ export default function Valve({
         <Button
           size="xs"
           variant="outline"
+          tabIndex={-1}
           onClick={() => {
             closeValve(valve);
           }}
@@ -46,6 +47,7 @@ export default function Valve({
         <Button
           size="xs"
           variant="outline"
+          tabIndex={-1}
           onClick={() => {
             openValve(valve);
           }}

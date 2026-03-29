@@ -1,0 +1,13 @@
+@use '../../styles/main.scss' as *;
+
+.abortContainer {
+    @include flex(row, center, center);
+    height: 100%;
+
+    .abortButton {
+        @include border(2px, $colorRed300, 50%);
+        aspect-ratio: 1 / 1;
+
+        font-size: spacing(6);
+    }
+}

@@ -6,13 +6,14 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-main {
+body, main {
   isolation: isolate;
   font-family: $fontFamily;
   line-height: 104%;
@@ -28,4 +29,31 @@ button {
 
 ul {
   list-style: none;
+}
+
+:root,
+[class*="dockview-theme-"] {
+  --dv-border-radius: 0 !important;
+  --dv-tabs-and-actions-container-background-color: #{$colorNeutral950} !important;
+  --dv-tabs-and-actions-container-height: fit-content !important;
+  --dv-tab-margin: 0 !important;
+  --dv-tab-font-size: spacing(4) !important;
+  --dv-inactivegroup-visiblepanel-tab-background-color: #{$colorNeutral800} !important;
+  --dv-activegroup-visiblepanel-tab-background-color: #{$colorNeutral800} !important;
+  --dv-activegroup-hiddenpanel-tab-background-color: #{$colorNeutral900} !important;
+
+  --dv-group-view-background-color: #{$colorNeutral950} !important;
+
+  --dv-drag-over-border: 2px solid #{$colorNeutral500} !important;
+  --dv-active-sash-color: #{$colorNeutral500} !important;
+}
+
+:global {
+  .dv-tab {
+    border-radius: 0 !important;
+  }
+
+  .dv-groupview {
+    border: 1px solid #{$colorNeutral800} !important;
+  }
 }

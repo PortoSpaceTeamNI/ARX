@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import 'dockview-react/dist/styles/dockview.css';
 
 import FillingPage from '@/pages/FillingPage';
 import { initWebSocket } from '@/utils/webSocketManager';

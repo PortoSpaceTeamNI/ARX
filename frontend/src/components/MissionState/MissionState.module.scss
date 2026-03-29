@@ -1,16 +1,16 @@
 @use '../../styles/main.scss' as *;
 
-.missionStageGroup {
+.missionStateGroup {
     @include flex(row, center, stretch, spacing(4));
     height: 100%;
 
-    .stageSlot {
+    .stateSlot {
         flex: 1 1 auto;
 
         @include flex(row, center, center);
         container-type: size;
 
-        .stage {
+        .state {
             @include border(1px, $colorNeutral700, 50%);
             @include flex(row, center, center);
             aspect-ratio: 1 / 1;
@@ -36,7 +36,7 @@
         }
     }
 
-    .stageSeparator {
+    .stateSeparator {
         flex: 0 0 spacing(4);
         align-self: center;
 

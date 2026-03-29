@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './MissionStage.module.scss';
+import styles from './MissionState.module.scss';
 
 type MissionStageGroupProps = {
   currentStage: string;
@@ -12,19 +12,19 @@ export default function MissionStageGroup({
   stages,
 }: MissionStageGroupProps) {
   return (
-    <div className={styles.missionStageGroup}>
+    <div className={styles.missionStateGroup}>
       {stages.map((stage, index) => (
         <React.Fragment key={stage}>
-          <div className={styles.stageSlot}>
+          <div className={styles.stateSlot}>
             <div
-              className={`${styles.stage} ${index < stages.indexOf(currentStage) ? styles.complete : ''} ${index === stages.indexOf(currentStage) ? styles.current : ''}`}
+              className={`${styles.state} ${index < stages.indexOf(currentStage) ? styles.complete : ''} ${index === stages.indexOf(currentStage) ? styles.current : ''}`}
             >
               {stage}
             </div>
           </div>
           {index < stages.length - 1 && (
             <div
-              className={`${styles.stageSeparator} ${index < stages.indexOf(currentStage) ? styles.complete : ''}`}
+              className={`${styles.stateSeparator} ${index < stages.indexOf(currentStage) ? styles.complete : ''}`}
             />
           )}
         </React.Fragment>

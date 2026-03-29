@@ -1,0 +1,11 @@
+@use '../../styles/main.scss' as *;
+
+.configPanel {
+    .serialPort {
+        @include flex(row, space-between, center, spacing(2));
+
+        .select {
+            flex-grow: 1;
+        }
+    }
+}

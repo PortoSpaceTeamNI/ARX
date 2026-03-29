@@ -1,0 +1,48 @@
+@use '../../styles/main.scss' as *;
+
+
+.fillingStationPanel {
+    @include flex(row, center, center);
+    position: relative;
+    height: 100%;
+
+    .pressurizingValve {
+        @include centerDisplacement(-229px, -88px);
+    }
+
+    .ventValve {
+        @include centerDisplacement(-180px, -50px);
+    }
+
+    .abortValve {
+        @include centerDisplacement(-180px, 180px);
+    }
+
+    .mainValve {
+        @include centerDisplacement(-229px, 235px);
+    }
+
+    .n2oFillValve {
+        @include centerDisplacement(47px, 20px);
+    }
+
+    .n2oPurgeValve {
+        @include centerDisplacement(-60px, 60px);
+    }
+
+    .n2FillValve {
+        @include centerDisplacement(80px, -140px);
+    }
+
+    .n2PurgeValve {
+        @include centerDisplacement(40px, -205px);
+    }
+
+    .n2oQuickDcValve {
+        @include centerDisplacement(-100px, -10px);
+    }
+
+    .n2QuickDcValve {
+        @include centerDisplacement(-100px, -122px);
+    }
+}
