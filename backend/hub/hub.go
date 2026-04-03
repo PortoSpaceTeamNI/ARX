@@ -5,8 +5,10 @@ import (
 	"log"
 	"missioncontrol/backend/globals"
 	"missioncontrol/backend/models/command"
+	"missioncontrol/backend/models/telemetry"
 	"net/http"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -15,14 +17,20 @@ import (
 type Hub struct {
 	Mu            sync.Mutex
 	GroundStation *websocket.Conn
+
+	GrafanaQueue chan telemetry.Telemetry
 }
 
 func NewHub() *Hub {
-	return &Hub{}
+	return &Hub{
+		GrafanaQueue: make(chan telemetry.Telemetry, 100),
+	}
 }
 
 func (h *Hub) Run() {
 	defer close(globals.CommandChannel)
+
+	go h.RunGrafanaPusher()
 
 	for data := range globals.TelemetryChannel {
 		msg, err := json.Marshal(data)
@@ -32,6 +40,11 @@ func (h *Hub) Run() {
 		}
 
 		h.Broadcast(msg)
+
+		select {
+		case h.GrafanaQueue <- data:
+		default:
+		}
 	}
 }
 
@@ -46,6 +59,25 @@ func (h *Hub) Broadcast(msg []byte) {
 			h.GroundStation.Close()
 			h.GroundStation = nil
 		}
+	}
+}
+
+func (h *Hub) RunGrafanaPusher() {
+	url := "http://grafana:3000/api/live/push/telemetry_stream"
+
+	for t := range h.GrafanaQueue {
+		req, err := http.NewRequest("POST", url, strings.NewReader(t.ToGrafanaString()))
+		if err != nil {
+			log.Printf("Failed to create Grafana request: %v", err)
+			continue
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Printf("Failed to push to Grafana: %v", err)
+			continue
+		}
+		resp.Body.Close()
 	}
 }
 

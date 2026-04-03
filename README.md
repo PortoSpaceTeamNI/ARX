@@ -1,4 +1,2 @@
-- Grafana
 - Escolha dos Serial Ports
     - Poder escolher o serial port automaticamente em qualquer altura ao invés de só no startup
-- Mudar frontend para Dockview
