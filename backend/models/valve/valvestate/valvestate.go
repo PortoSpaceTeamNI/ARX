@@ -26,8 +26,21 @@ func (vs ValveState) ToString() string {
 	case OpeningNotAcked:
 		return "Opening Not Acked"
 	default:
-		return "(This valve state doesn't exist)"
+		return "(This valve state doesn't exist something is wrong)"
 	}
+}
+
+func (vs ValveState) Binarize() ValveState {
+	switch vs {
+	case Closing:
+	case ClosingNotAcked:
+		return Opened
+	case Opening:
+	case OpeningNotAcked:
+		return Closed
+	}
+
+	return vs
 }
 
 /*func (vs ValveState) CanTransitionTo(goal ValveState) bool {

@@ -1,0 +1,190 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "libraryPanel": {
+        "name": "Drogue Parachute Ematch",
+        "uid": "afi763cjfg9oga"
+      },
+      "title": "Drogue Parachute Ematch",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 9,
+      "libraryPanel": {
+        "name": "Main Parachute Ematch",
+        "uid": "bfi75p23prmkgd"
+      },
+      "title": "Main Parachute Ematch",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 8,
+      "libraryPanel": {
+        "name": "Main Valve",
+        "uid": "afi75dpp0f94we"
+      },
+      "title": "Main Valve",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 7,
+      "libraryPanel": {
+        "name": "Velocity Z",
+        "uid": "bfi6ysujpxf5se"
+      },
+      "title": "Velocity Z",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "id": 6,
+      "libraryPanel": {
+        "name": "Lift Thrust 3",
+        "uid": "cfi6y9a0zxvcwc"
+      },
+      "title": "Lift Thrust 3",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "id": 5,
+      "libraryPanel": {
+        "name": "Lift Thrust 2",
+        "uid": "afi6y5ohzzls0e"
+      },
+      "title": "Lift Thrust 2",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 4,
+      "libraryPanel": {
+        "name": "Lift Thrust 1",
+        "uid": "efi6y3ed76iv4f"
+      },
+      "title": "Lift Thrust 1",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
+      "id": 3,
+      "libraryPanel": {
+        "name": "Chamber Pressure",
+        "uid": "efi6yrl8d8phcf"
+      },
+      "title": "Chamber Pressure",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 64
+      },
+      "id": 2,
+      "libraryPanel": {
+        "name": "Altitude",
+        "uid": "afi6ys2oop8n4c"
+      },
+      "title": "Altitude",
+      "type": "library-panel-ref"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 72
+      },
+      "id": 1,
+      "libraryPanel": {
+        "name": "Acceleration Z",
+        "uid": "bfi6yts4pa800a"
+      },
+      "title": "Acceleration Z",
+      "type": "library-panel-ref"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Launch",
+  "uid": "bf5c35c1-ae9d-4560-bf00-f9e06cfc4617",
+  "version": 5,
+  "weekStart": ""
+}

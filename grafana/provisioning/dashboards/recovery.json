@@ -19,7 +19,23 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "links": [],
-  "panels": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "libraryPanel": {
+        "name": "N2O Tank Pressure",
+        "uid": "dfi6vva6400sga"
+      },
+      "title": "N2O Tank Pressure",
+      "type": "library-panel-ref"
+    }
+  ],
   "preload": false,
   "schemaVersion": 42,
   "tags": [],
@@ -32,8 +48,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "ARX",
-  "uid": "g7n2dz",
+  "title": "Recovery",
+  "uid": "2f73bbcd-37da-4e35-b9a9-547c4b1fdd0d",
   "version": 1,
   "weekStart": ""
 }
