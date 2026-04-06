@@ -41,9 +41,11 @@ func (h *Hub) Run() {
 
 		h.Broadcast(msg)
 
-		select {
-		case h.GrafanaQueue <- data:
-		default:
+		if data.Status != nil {
+			select {
+			case h.GrafanaQueue <- data:
+			default:
+			}
 		}
 	}
 }
