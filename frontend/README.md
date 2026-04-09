@@ -4,7 +4,7 @@
 ```
 docker compose --profile dev up
 ```
-Runs a Vite development server with live updates in port 8080
+Runs a Vite development server with live updates in port 3000
 
 ### Run Linting
 ```

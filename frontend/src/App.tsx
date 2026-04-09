@@ -10,7 +10,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<FillingPage />} />
+        <Route path="/">
+          <Route path="filling" element={<FillingPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

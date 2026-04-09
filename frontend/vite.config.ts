@@ -29,7 +29,7 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
     host: '0.0.0.0',
-    origin: 'http://0.0.0.0:3000',
+    //origin: 'http://0.0.0.0:3000',
     proxy: {
       '/ws': {
         target: 'http://backend-dev:8080',
