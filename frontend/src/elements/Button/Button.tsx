@@ -25,6 +25,7 @@ export default function Button({
       className={`${styles.button} ${className} ${styles[variant]} ${variant === 'link' && location.pathname === to ? styles.active : ''} ${styles[size]}`}
       {...props}
       render={variant === 'link' ? <a href={to}>{children}</a> : undefined}
+      nativeButton={variant !== 'link'}
       role={variant === 'link' ? 'link' : undefined}
     >
       {variant !== 'link' && children}

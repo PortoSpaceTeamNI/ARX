@@ -2,37 +2,36 @@
 
 .field {
     @include flex(row, space-between, center);
+}
 
-    .label {
-        text-wrap: nowrap;
-        color: $colorNeutral300;
+.label {
+    text-wrap: nowrap;
+    color: $colorNeutral300;
+}
+
+.select {
+    @include flex(row, space-between, center, spacing(1));
+    min-width: 8rem;
+    width: fit-content;
+    padding: spacing(1) 0 spacing(1) spacing(1);
+    @include border(1px, $colorNeutral700);
+    outline: 0;
+
+    background-color: $colorNeutral900;
+    color: $colorNeutral200;
+
+    &:hover {
+        background-color: $colorNeutral800;
     }
 
-    .select {
-        @include flex(row, space-between, center, spacing(1));
-        min-width: 8rem;
-        width: fit-content;
-        padding: spacing(1) 0 spacing(1) spacing(1);
-        @include border(1px, $colorNeutral700);
-        outline: 0;
-
-        background-color: $colorNeutral900;
-        color: $colorNeutral200;
-
-        &:hover {
-            background-color: $colorNeutral800;
-        }
-
-        .value[data-placeholder] {
-            opacity: 0.6;
-        }
-
-        .icon {
-            display: flex;
-            filter: $colorNeutral500Filter;
-        }
+    .value[data-placeholder] {
+        opacity: 0.6;
     }
 
+    .icon {
+        display: flex;
+        filter: $colorNeutral500Filter;
+    }
 }
 
 .positioner {

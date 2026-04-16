@@ -15,7 +15,7 @@ import (
 type SerialStream struct {
 }
 
-func FindAvailablePort() (string, error) {
+func FindAvailablePort(currentPort string) (string, error) {
 	ports, err := serial.GetPortsList()
 	if err != nil {
 		return "", err
@@ -28,7 +28,11 @@ func FindAvailablePort() (string, error) {
 	expectedHeader := []byte{pkt.SyncByte, byte(communicatorid.OBC), byte(communicatorid.MissionControl), byte(commandid.Ack)}
 
 	for _, portName := range ports {
-		found, err := probePort(portName, bytes, expectedHeader)
+		if portName == currentPort {
+			continue
+		}
+
+		found, err := ProbePort(portName, bytes, expectedHeader)
 		if err != nil {
 			log.Printf("Port %s failed probe: %v", portName, err)
 			continue
@@ -42,7 +46,7 @@ func FindAvailablePort() (string, error) {
 	return "", fmt.Errorf("No valid device responded to status probe")
 }
 
-func probePort(portName string, probe []byte, expectedHeader []byte) (bool, error) {
+func ProbePort(portName string, probe []byte, expectedHeader []byte) (bool, error) {
 	mode := &serial.Mode{
 		BaudRate: 115200,
 	}

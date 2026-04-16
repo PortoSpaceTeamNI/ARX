@@ -10,14 +10,13 @@ import (
 	"missioncontrol/backend/models/valve/valvestate"
 	"missioncontrol/backend/stream"
 	"time"
-
-	"go.bug.st/serial"
 )
 
 type MissionControl struct {
 	CommandQueue  []command.ICommand
 	PendingValves map[valve.Valve]valvestate.ValveState
 	Telemetry     telemetry.Telemetry
+	PortMonitor   *PortMonitor
 
 	CurrentCommand      command.ICommand
 	LastCommandSentTime time.Time
@@ -26,25 +25,20 @@ type MissionControl struct {
 func NewMissionControl() *MissionControl {
 	return &MissionControl{
 		PendingValves: make(map[valve.Valve]valvestate.ValveState),
+		PortMonitor:   NewPortMonitor(""),
 	}
 }
 
 func NewLiveMissionControl() *MissionControl {
 	mc := NewMissionControl()
 
-	port, err := stream.FindAvailablePort()
+	port, err := stream.FindAvailablePort(mc.Telemetry.CurrentPort.Port)
 	if err != nil {
 		log.Printf("Mission Control initialized in IDLE mode: %v", err)
 
 	} else {
 		log.Printf("Valid Port Found: %s", port)
-
-		updateCmd := &command.UpdateSerialPortCommand{
-			SerialPort: port,
-		}
-
-		globals.RequestChannel <- updateCmd
-		mc.Telemetry.CurrentPort = port
+		mc.updateSerialPort(port)
 	}
 
 	return mc
@@ -53,6 +47,8 @@ func NewLiveMissionControl() *MissionControl {
 func (mc *MissionControl) Run() {
 	defer close(globals.TelemetryChannel)
 	defer close(globals.RequestChannel)
+
+	go mc.PortMonitor.Run()
 
 	heartbeatTicker := time.NewTicker(globals.HeartbeatInterval)
 	defer heartbeatTicker.Stop()
@@ -81,8 +77,10 @@ func (mc *MissionControl) Run() {
 				mc.CommandQueue = append(mc.CommandQueue, cmd)
 			}
 
+		case availablePorts := <-mc.PortMonitor.RespChan:
+			mc.Telemetry.AvailablePorts = availablePorts
+
 		case <-heartbeatTicker.C:
-			mc.Telemetry.AvailablePorts, _ = serial.GetPortsList()
 			mc.Heartbeat()
 
 		case <-timeoutTicker.C:
@@ -98,9 +96,9 @@ func (mc *MissionControl) HandleResponse(res command.Response) {
 	}
 
 	mc.Telemetry.Latency = float64(res.SyncByteTime.Sub(mc.LastCommandSentTime).Microseconds()) / 1e3
-	//if mc.CurrentCommand != nil {
-	mc.Telemetry.CommandLog = fmt.Sprintf("[RCV]: %s Ack", mc.CurrentCommand.ToString())
-	//}
+	if mc.CurrentCommand != nil {
+		mc.Telemetry.CommandLog = fmt.Sprintf("[RCV]: %s Ack", mc.CurrentCommand.ToString())
+	}
 
 	switch r := res.Data.(type) {
 	case command.ParsedManualExecResponse: // TODO: This implementation assumes that, when currentCommand has a response type of ManualExec then the first received response will be relative to that command, which migh not be the case
@@ -135,6 +133,7 @@ func (mc *MissionControl) HandleResponse(res command.Response) {
 		}
 	}
 
+	mc.Telemetry.CurrentPort.State = true
 	globals.TelemetryChannel <- mc.Telemetry
 	mc.HandleQueue()
 }
@@ -160,6 +159,13 @@ func (mc *MissionControl) HandleCommand(cmd command.ICommand) {
 		}
 
 		mc.CurrentCommand = cmd
+
+	} else {
+		if updateCmd, ok := cmd.(*command.UpdateSerialPortCommand); ok {
+			if !mc.handleSerialPortUpdate(updateCmd) {
+				return
+			}
+		}
 	}
 
 	mc.sendCommand(cmd)
@@ -207,21 +213,64 @@ func (mc *MissionControl) CheckTimeout() {
 		log.Println("Timeout: Jumping queue with Port Update")
 
 		portCmd := mc.CommandQueue[portCmdIndex]
-		mc.CommandQueue = append(mc.CommandQueue[:portCmdIndex], mc.CommandQueue[portCmdIndex+1:]...)
+		updateCmd := portCmd.(*command.UpdateSerialPortCommand)
 
-		globals.RequestChannel <- portCmd
+		if mc.handleSerialPortUpdate(updateCmd) {
+			mc.CommandQueue = append(mc.CommandQueue[:portCmdIndex], mc.CommandQueue[portCmdIndex+1:]...)
+			globals.RequestChannel <- portCmd
 
-		mc.Telemetry.CommandLog = "[SYS]: Attempting rescue port swap"
-		globals.TelemetryChannel <- mc.Telemetry
-
-		return
+			mc.Telemetry.CommandLog = "[SYS]: Attempting rescue port swap"
+			globals.TelemetryChannel <- mc.Telemetry
+			
+			if mc.CurrentCommand != nil {
+				mc.sendCommand(mc.CurrentCommand)
+			}
+			return
+		}
 	}
 
 	log.Println("Retrying command")
 	mc.Telemetry.PacketLoss++
 	mc.Telemetry.Latency = 0
 	mc.Telemetry.CommandLog = fmt.Sprintf("[ERROR]: Retrying %s", mc.CurrentCommand.ToString())
+	mc.Telemetry.CurrentPort.State = false
 	globals.TelemetryChannel <- mc.Telemetry
 
 	mc.sendCommand(mc.CurrentCommand)
+}
+
+func (mc *MissionControl) handleSerialPortUpdate(updateCmd *command.UpdateSerialPortCommand) bool {
+	if updateCmd.SerialPort == "find" {
+		if !mc.Telemetry.CurrentPort.State {
+			port, err := stream.FindAvailablePort(mc.Telemetry.CurrentPort.Port)
+			if err == nil && port != "" {
+				updateCmd.SerialPort = port
+			} else {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
+	mc.Telemetry.CurrentPort = telemetry.AvailablePort{Port: updateCmd.SerialPort, State: true}
+	select {
+	case mc.PortMonitor.UpdatePortChan <- updateCmd.SerialPort:
+	default:
+	}
+
+	return true
+}
+
+func (mc *MissionControl) updateSerialPort(port string) {
+	updateCmd := &command.UpdateSerialPortCommand{
+		SerialPort: port,
+	}
+
+	if mc.handleSerialPortUpdate(updateCmd) {
+		globals.RequestChannel <- updateCmd
+		if mc.CurrentCommand != nil {
+			mc.sendCommand(mc.CurrentCommand)
+		}
+	}
 }

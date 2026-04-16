@@ -11,6 +11,7 @@ const (
 	HeartbeatInterval time.Duration = 1000 * time.Millisecond
 	CommandTimeout    time.Duration = 1000 * time.Millisecond
 	DoubtInterval     time.Duration = 10 * time.Second // TODO: Doubt state
+	PortScanInterval  time.Duration = 5 * time.Second
 )
 
 // Communication Channels

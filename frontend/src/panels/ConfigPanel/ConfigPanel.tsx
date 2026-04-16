@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Circle, Search } from 'lucide-react';
 
 import Button from '@/elements/Button';
 import Select from '@/elements/Select';
@@ -15,16 +15,28 @@ export default function ConfigPanel() {
       <li className={styles.serialPort}>
         <Select
           label="Serial Port"
-          items={telemetry.availablePorts}
-          value={telemetry.currentPort}
+          value={telemetry.currentPort.port}
           onValueChange={(val) => val && updateSerialPort(val)}
-          className={styles.select}
-        />
+          className={styles.serialField}
+        >
+          {telemetry.availablePorts.map((port) => (
+            <Select.Item
+              key={port.port}
+              value={port.port}
+              className={styles.item}
+            >
+              {port.port}
+              <Circle
+                className={port.state ? styles.connected : styles.disconnected}
+              />
+            </Select.Item>
+          ))}
+        </Select>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => {
-            /*updateSerialPort("search") TODO: This*/
+            updateSerialPort('find');
           }}
         >
           <Search />

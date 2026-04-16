@@ -9,10 +9,6 @@ docker compose --profile dev up
 
 
 ### TODO:
-- Escolha dos Serial Ports
-    - Poder escolher o serial port automaticamente em qualquer altura ao invés de só no startup
-    - 2 obcs ligados, se ligar a um fica esse, só dá pra tocar se for comando manual,
-    - status verdes nas opções
 - Tabs para outras páginas: Config, Debug, Filling, Launch, Recovery
 - Poder voltar a adicionar panels q se fecha
 - Página de config para configurar as os atuadores das hydras a cada válvula

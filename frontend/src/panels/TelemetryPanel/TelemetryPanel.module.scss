@@ -8,5 +8,15 @@
 
     .telemetryUnit {
         width: 1%;
+
+        .connected {
+            height: 1rem;
+            color: $colorLime500;
+        }
+
+        .disconnected {
+            height: 1rem;
+            color: $colorRed500;
+        }
     }
 }

@@ -4,8 +4,24 @@
     .serialPort {
         @include flex(row, space-between, center, spacing(2));
 
-        .select {
+        .serialField {
             flex-grow: 1;
+
+            button {
+                width: 10rem;
+            }
         }
+    }
+}
+
+.item {
+    @include flex(row, space-between, center, spacing(2));
+
+    .connected {
+        color: $colorLime500;
+    }
+
+    .disconnected {
+        color: $colorRed500;
     }
 }

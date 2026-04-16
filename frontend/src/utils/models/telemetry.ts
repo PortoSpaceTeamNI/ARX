@@ -16,8 +16,13 @@ export type Telemetry = {
     liftFs: LiftFS;
   };
   commandLog: string;
-  availablePorts: string[];
-  currentPort: string;
+  availablePorts: AvailablePort[];
+  currentPort: AvailablePort;
+};
+
+type AvailablePort = {
+  port: string;
+  state: boolean;
 };
 
 type OBC = {
