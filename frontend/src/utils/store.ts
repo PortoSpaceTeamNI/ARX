@@ -27,7 +27,10 @@ export const useMissionControl = create<MissionControlState>()((set) => ({
     dataRate: 0,
     commandLog: '',
     availablePorts: [],
-    currentPort: '',
+    currentPort: {
+      port: '',
+      state: false,
+    },
     status: {
       obc: {
         state: MissionState.Idle,
