@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow } from '@/elements/Table';
+import Table from '@/elements/Table';
 import { useMissionControl } from '@/utils/store';
 
 import styles from './TelemetryPanel.module.scss';
@@ -8,29 +8,29 @@ export default function TelemetryPanel() {
 
   return (
     <Table className={styles.telemetryTable}>
-      <TableBody>
-        <TableRow>
-          <TableCell>Packet Loss</TableCell>
-          <TableCell className={styles.telemetryValue}>
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell>Packet Loss</Table.Cell>
+          <Table.Cell className={styles.telemetryValue}>
             {telemetry.packetLoss}
-          </TableCell>
-          <TableCell className={styles.telemetryUnit}>pkts</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Data Rate</TableCell>
-          <TableCell className={styles.telemetryValue}>
+          </Table.Cell>
+          <Table.Cell className={styles.telemetryUnit}>pkts</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Data Rate</Table.Cell>
+          <Table.Cell className={styles.telemetryValue}>
             {telemetry.dataRate}
-          </TableCell>
-          <TableCell className={styles.telemetryUnit}>B/s</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Latency</TableCell>
-          <TableCell className={styles.telemetryValue}>
+          </Table.Cell>
+          <Table.Cell className={styles.telemetryUnit}>B/s</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Latency</Table.Cell>
+          <Table.Cell className={styles.telemetryValue}>
             {telemetry.latency}
-          </TableCell>
-          <TableCell className={styles.telemetryUnit}>ms</TableCell>
-        </TableRow>
-      </TableBody>
+          </Table.Cell>
+          <Table.Cell className={styles.telemetryUnit}>ms</Table.Cell>
+        </Table.Row>
+      </Table.Body>
     </Table>
   );
 }

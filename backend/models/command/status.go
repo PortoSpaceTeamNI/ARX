@@ -154,6 +154,10 @@ func (c *StatusCommand) ParseResponse(raw packet.Packet) (IResponse, error) {
 		return float64(val) / 100.0
 	}
 
+	scale32 := func(val int32) float64 {
+		return float64(val) / 100.0
+	}
+
 	return ParsedStatusResponse{
 		OBC: OBC{
 			State:     missionstate.MissionState(p.MissionState),
@@ -201,12 +205,12 @@ func (c *StatusCommand) ParseResponse(raw packet.Packet) (IResponse, error) {
 		},
 		LiftR: LiftR{
 			MainEmatch: isSet(payload.LiftRMainEmatch),
-			Loadcell1:  scale(p.LiftRLoadCell1),
-			Loadcell2:  scale(p.LiftRLoadCell2),
-			Loadcell3:  scale(p.LiftRLoadCell3),
+			Loadcell1:  scale32(p.LiftRLoadCell1),
+			Loadcell2:  scale32(p.LiftRLoadCell2),
+			Loadcell3:  scale32(p.LiftRLoadCell3),
 		},
 		LiftFS: LiftFS{
-			N2OLoadcell: scale(p.LiftFSN2OLoadCell),
+			N2OLoadcell: scale32(p.LiftFSN2OLoadCell),
 		},
 		Elytra: Elytra{
 			DrogueChuteEmatch: isSet(payload.ElytraDrogueParachuteEmatch),

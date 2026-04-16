@@ -4,6 +4,7 @@ import {
   themeAbyssSpaced,
 } from 'dockview-react';
 
+import Navbar from '@/components/Navbar';
 import PopoutButton from '@/components/PopoutButton';
 import AbortPanel from '@/panels/AbortPanel';
 import CommandLogPanel from '@/panels/CommandLogPanel';
@@ -115,21 +116,25 @@ export default function FillingPage() {
 
   return (
     <main className={styles.fillingPage}>
-      <DockviewReact
-        theme={themeAbyssSpaced}
-        onReady={onReady}
-        rightHeaderActionsComponent={PopoutButton}
-        components={{
-          default: () => <div />,
-          ConfigPanel: ConfigPanel,
-          FillingStatePanel: FillingStatePanel,
-          FillingStationPanel: FillingStationPanel,
-          LogCommandsPanel: LogCommandsPanel,
-          TelemetryPanel: TelemetryPanel,
-          CommandLogPanel: CommandLogPanel,
-          AbortPanel: AbortPanel,
-        }}
-      />
+      <Navbar />
+
+      <div className={styles.dockviewContainer}>
+        <DockviewReact
+          theme={themeAbyssSpaced}
+          onReady={onReady}
+          rightHeaderActionsComponent={PopoutButton}
+          components={{
+            default: () => <div />,
+            ConfigPanel: ConfigPanel,
+            FillingStatePanel: FillingStatePanel,
+            FillingStationPanel: FillingStationPanel,
+            LogCommandsPanel: LogCommandsPanel,
+            TelemetryPanel: TelemetryPanel,
+            CommandLogPanel: CommandLogPanel,
+            AbortPanel: AbortPanel,
+          }}
+        />
+      </div>
     </main>
   );
 }

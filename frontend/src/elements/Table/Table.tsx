@@ -5,7 +5,10 @@ type TableComponentProps = {
   children?: React.ReactNode;
 };
 
-export function Table({ className = '', children }: TableComponentProps) {
+export default function Table({
+  className = '',
+  children,
+}: TableComponentProps) {
   return (
     <table
       cellSpacing={0}
@@ -17,22 +20,25 @@ export function Table({ className = '', children }: TableComponentProps) {
   );
 }
 
-export function TableHeader({ className = '', children }: TableComponentProps) {
+Table.Header = function Header({
+  className = '',
+  children,
+}: TableComponentProps) {
   return <thead className={className}>{children}</thead>;
-}
+};
 
-export function TableBody({ className = '', children }: TableComponentProps) {
+Table.Body = function Body({ className = '', children }: TableComponentProps) {
   return <tbody className={className}>{children}</tbody>;
-}
+};
 
-export function TableRow({ className = '', children }: TableComponentProps) {
+Table.Row = function Row({ className = '', children }: TableComponentProps) {
   return <tr className={`${styles.tableRow} ${className}`}>{children}</tr>;
-}
+};
 
-export function TableHead({ className = '', children }: TableComponentProps) {
+Table.Head = function Head({ className = '', children }: TableComponentProps) {
   return <th className={`${styles.tableHead} ${className}`}>{children}</th>;
-}
+};
 
-export function TableCell({ className = '', children }: TableComponentProps) {
+Table.Cell = function Cell({ className = '', children }: TableComponentProps) {
   return <td className={`${styles.tableCell} ${className}`}>{children}</td>;
-}
+};

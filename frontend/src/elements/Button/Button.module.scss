@@ -72,4 +72,19 @@
             @include outline(3px, $colorRed300);
         }
     }
+
+    &.link {
+        display: inline-flex;
+        background-color: transparent;
+        border: none;
+
+        color: $colorNeutral50;
+        font-weight: $fontMedium;
+
+        &.active, &:hover {
+            text-decoration: underline;
+            text-underline-offset: spacing(2); 
+            text-decoration-thickness: spacing(0.25);
+        }
+    }
 }

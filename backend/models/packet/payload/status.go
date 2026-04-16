@@ -23,10 +23,10 @@ type StatusResponsePayload struct {
 	HydraLFProbeThermo2       int16
 	HydraLFChamberTemperature int16
 	HydraFSN2OTemperature     int16
-	LiftFSN2OLoadCell         int16
-	LiftRLoadCell1            int16
-	LiftRLoadCell2            int16
-	LiftRLoadCell3            int16
+	LiftFSN2OLoadCell         int32
+	LiftRLoadCell1            int32
+	LiftRLoadCell2            int32
+	LiftRLoadCell3            int32
 }
 
 const (

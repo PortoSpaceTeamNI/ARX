@@ -27,6 +27,10 @@ button {
   font-family: $fontFamily;
 }
 
+a {
+  text-decoration: inherit;
+}
+
 ul {
   list-style: none;
 }
@@ -55,5 +59,9 @@ ul {
 
   .dv-groupview {
     border: 1px solid #{$colorNeutral800} !important;
+  }
+
+  .dockview-theme-abyss-spaced {
+    padding: 0 !important;
   }
 }

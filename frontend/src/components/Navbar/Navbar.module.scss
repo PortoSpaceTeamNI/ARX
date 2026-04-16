@@ -1,0 +1,9 @@
+@use '../../styles/main.scss' as *;
+
+.navbar {
+    @include flex(row, space-between, center);
+
+    ul {
+        display: flex;
+    }
+}
