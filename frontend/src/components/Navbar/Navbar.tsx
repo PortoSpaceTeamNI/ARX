@@ -1,11 +1,36 @@
+import type { DockviewApi } from 'dockview-react';
 import { LayoutDashboard, Plus, RefreshCw, Save, Settings } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 import Button from '@/elements/Button';
 import Menu from '@/elements/Menu';
+import { loadFillingDefaultLayout } from '@/pages/FillingPage/FillingPage';
 
 import styles from './Navbar.module.scss';
 
-export default function Navbar() {
+type NavbarProps = {
+  dockviewApi: DockviewApi | null;
+};
+
+export default function Navbar({ dockviewApi }: NavbarProps) {
+  const location = useLocation();
+
+  const handleRefreshDefaultLayout = () => {
+    if (!dockviewApi) return;
+
+    if (location.pathname === '/filling') {
+      loadFillingDefaultLayout(dockviewApi);
+    }
+
+    if (location.pathname === '/launch') {
+      //loadLaunchDefaultLayout(dockviewApi);
+    }
+
+    if (location.pathname === '/recovery') {
+      //loadRecoveryDefaultLayout(dockviewApi);
+    }
+  };
+
   return (
     <nav className={styles.navbar}>
       <ul>
@@ -36,7 +61,11 @@ export default function Navbar() {
             </Menu.Trigger>
             <Menu.Items>
               <Menu.Item>
-                <Button variant="outline" className={styles.stretched}>
+                <Button
+                  variant="outline"
+                  className={styles.stretched}
+                  onClick={handleRefreshDefaultLayout}
+                >
                   <RefreshCw /> Refresh Default Layout
                 </Button>
               </Menu.Item>
