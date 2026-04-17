@@ -18,5 +18,4 @@ docker compose --profile dev up
 - API Maps para coordenadas gps
 - Diagrama 3d do rocket
 - Mapeamento dos bar e temp para estado do óxido nitroso
-- Bolinha verde na telemetria para ver se há conexão
 - 10 segundos de trust

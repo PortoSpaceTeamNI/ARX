@@ -1,6 +1,7 @@
-import { Plus, Settings } from 'lucide-react';
+import { LayoutDashboard, Plus, RefreshCw, Save, Settings } from 'lucide-react';
 
 import Button from '@/elements/Button';
+import Menu from '@/elements/Menu';
 
 import styles from './Navbar.module.scss';
 
@@ -27,9 +28,30 @@ export default function Navbar() {
 
       <ul>
         <li>
-          <Button variant="ghost" size="iconLg">
-            <Plus />
-          </Button>
+          <Menu>
+            <Menu.Trigger>
+              <Button variant="ghost" size="iconLg">
+                <LayoutDashboard />
+              </Button>
+            </Menu.Trigger>
+            <Menu.Items>
+              <Menu.Item>
+                <Button variant="outline" className={styles.stretched}>
+                  <RefreshCw /> Refresh Default Layout
+                </Button>
+              </Menu.Item>
+              <Menu.Item>
+                <Button variant="outline" className={styles.stretched}>
+                  <Save /> Save Current Layout
+                </Button>
+              </Menu.Item>
+              <Menu.Item>
+                <Button variant="outline" className={styles.stretched}>
+                  <Plus /> Add Panel
+                </Button>
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
         </li>
         <li>
           <Button variant="ghost" size="iconLg">

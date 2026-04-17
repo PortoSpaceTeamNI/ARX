@@ -20,7 +20,6 @@ export default function Select({
   className,
 }: SelectProps) {
   const id = useId();
-  // Fallback to null to guarantee the component is initialized as controlled!
   const [localValue, setLocalValue] = useState<string | null>(value ?? null);
 
   useEffect(() => {
