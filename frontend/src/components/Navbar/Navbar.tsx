@@ -1,5 +1,5 @@
 import type { DockviewApi } from 'dockview-react';
-import { LayoutDashboard, Plus, RefreshCw, Save, Settings } from 'lucide-react';
+import { LayoutDashboard, RefreshCw, Save, Settings } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 import Button from '@/elements/Button';
