@@ -18,14 +18,17 @@ type MissionControl struct {
 	Telemetry     telemetry.Telemetry
 	PortMonitor   *PortMonitor
 
+	ValveStateDoubtTimer *time.Timer
+
 	CurrentCommand      command.ICommand
 	LastCommandSentTime time.Time
 }
 
 func NewMissionControl() *MissionControl {
 	return &MissionControl{
-		PendingValves: make(map[valve.Valve]valvestate.ValveState),
-		PortMonitor:   NewPortMonitor(""),
+		PendingValves:        make(map[valve.Valve]valvestate.ValveState),
+		PortMonitor:          NewPortMonitor(),
+		ValveStateDoubtTimer: time.NewTimer(globals.DoubtInterval),
 	}
 }
 
@@ -80,6 +83,9 @@ func (mc *MissionControl) Run() {
 		case availablePorts := <-mc.PortMonitor.RespChan:
 			mc.Telemetry.AvailablePorts = availablePorts
 
+		case <-mc.ValveStateDoubtTimer.C:
+			mc.HandleValveStateDoubtTimeout()
+
 		case <-heartbeatTicker.C:
 			mc.Heartbeat()
 
@@ -131,6 +137,14 @@ func (mc *MissionControl) HandleResponse(res command.Response) {
 		for valve := range mc.PendingValves {
 			delete(mc.PendingValves, valve)
 		}
+
+		if !mc.ValveStateDoubtTimer.Stop() {
+			select {
+			case <-mc.ValveStateDoubtTimer.C: // Drain the channel if it already expired
+			default:
+			}
+		}
+		mc.ValveStateDoubtTimer.Reset(globals.DoubtInterval)
 	}
 
 	mc.Telemetry.CurrentPort.State = true
@@ -196,6 +210,14 @@ func (mc *MissionControl) Heartbeat() {
 	mc.HandleCommand(&command.StatusCommand{})
 }
 
+func (mc *MissionControl) HandleValveStateDoubtTimeout() {
+	if mc.Telemetry.Status != nil {
+		mc.Telemetry.SetValveStatesToUnknown()
+		mc.Telemetry.CommandLog = fmt.Sprintf("[ERR]: No Status received in %.0f seconds", globals.DoubtInterval.Seconds())
+		globals.TelemetryChannel <- mc.Telemetry
+	}
+}
+
 func (mc *MissionControl) CheckTimeout() {
 	if mc.CurrentCommand == nil || time.Since(mc.LastCommandSentTime) <= globals.CommandTimeout {
 		return
@@ -221,7 +243,7 @@ func (mc *MissionControl) CheckTimeout() {
 
 			mc.Telemetry.CommandLog = "[SYS]: Attempting rescue port swap"
 			globals.TelemetryChannel <- mc.Telemetry
-			
+
 			if mc.CurrentCommand != nil {
 				mc.sendCommand(mc.CurrentCommand)
 			}
@@ -232,7 +254,8 @@ func (mc *MissionControl) CheckTimeout() {
 	log.Println("Retrying command")
 	mc.Telemetry.PacketLoss++
 	mc.Telemetry.Latency = 0
-	mc.Telemetry.CommandLog = fmt.Sprintf("[ERROR]: Retrying %s", mc.CurrentCommand.ToString())
+	mc.Telemetry.CommandLog = fmt.Sprintf("[ERR]: Retrying %s", mc.CurrentCommand.ToString())
+	mc.Telemetry.CurrentPort.Port = ""
 	mc.Telemetry.CurrentPort.State = false
 	globals.TelemetryChannel <- mc.Telemetry
 

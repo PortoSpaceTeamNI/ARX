@@ -18,9 +18,9 @@ type PortMonitor struct {
 	RespChan       chan []telemetry.AvailablePort
 }
 
-func NewPortMonitor(initialPort string) *PortMonitor {
+func NewPortMonitor() *PortMonitor {
 	return &PortMonitor{
-		currentPort:    initialPort,
+		currentPort:    "",
 		UpdatePortChan: make(chan string, 1),
 		RespChan:       make(chan []telemetry.AvailablePort, 1),
 	}

@@ -5,6 +5,7 @@ export const ValveState = {
   Opening: 3,
   ClosingNotAcked: 4,
   OpeningNotAcked: 5,
+  Unknown: 6,
 } as const;
 
 export type ValveState = (typeof ValveState)[keyof typeof ValveState];

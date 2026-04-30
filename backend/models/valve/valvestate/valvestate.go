@@ -9,6 +9,7 @@ const (
 	Opening
 	ClosingNotAcked
 	OpeningNotAcked
+	Unknown
 )
 
 func (vs ValveState) ToString() string {
@@ -25,6 +26,8 @@ func (vs ValveState) ToString() string {
 		return "Closing Not Acked"
 	case OpeningNotAcked:
 		return "Opening Not Acked"
+	case Unknown:
+		return "Unknown"
 	default:
 		return "(This valve state doesn't exist something is wrong)"
 	}

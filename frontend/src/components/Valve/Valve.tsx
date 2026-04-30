@@ -39,7 +39,7 @@ export default function Valve({
           onClick={() => {
             closeValve(valve);
           }}
-          className={`${styles.closeButton} ${state === ValveState.Closed ? styles.closed : ''} ${state === ValveState.Closing ? styles.stateTransition : ''}`}
+          className={`${styles.closeButton} ${state === ValveState.Closed ? styles.closed : ''} ${state === ValveState.Closing || state === ValveState.Unknown ? styles.stateTransition : ''}`}
         >
           Close
         </Button>
@@ -51,7 +51,7 @@ export default function Valve({
           onClick={() => {
             openValve(valve);
           }}
-          className={`${styles.openButton} ${state === ValveState.Opened ? styles.opened : ''} ${state === ValveState.Opening ? styles.stateTransition : ''}`}
+          className={`${styles.openButton} ${state === ValveState.Opened ? styles.opened : ''} ${state === ValveState.Opening || state === ValveState.Unknown ? styles.stateTransition : ''}`}
         >
           Open
         </Button>

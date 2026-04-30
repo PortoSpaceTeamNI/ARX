@@ -15,7 +15,7 @@ type NavbarProps = {
 export default function Navbar({ dockviewApi }: NavbarProps) {
   const location = useLocation();
 
-  const handleRefreshDefaultLayout = () => {
+  const handleLoadDefaultLayout = () => {
     if (!dockviewApi) return;
 
     if (location.pathname === '/filling') {
@@ -64,19 +64,14 @@ export default function Navbar({ dockviewApi }: NavbarProps) {
                 <Button
                   variant="outline"
                   className={styles.stretched}
-                  onClick={handleRefreshDefaultLayout}
+                  onClick={handleLoadDefaultLayout}
                 >
-                  <RefreshCw /> Refresh Default Layout
+                  <RefreshCw /> Load Default Layout
                 </Button>
               </Menu.Item>
               <Menu.Item>
                 <Button variant="outline" className={styles.stretched}>
                   <Save /> Save Current Layout
-                </Button>
-              </Menu.Item>
-              <Menu.Item>
-                <Button variant="outline" className={styles.stretched}>
-                  <Plus /> Add Panel
                 </Button>
               </Menu.Item>
             </Menu.Items>

@@ -3,6 +3,7 @@ package telemetry
 import (
 	"fmt"
 	"missioncontrol/backend/models/command"
+	"missioncontrol/backend/models/valve/valvestate"
 	"strings"
 )
 
@@ -19,6 +20,19 @@ type Telemetry struct {
 	CommandLog     string                        `json:"commandLog"`
 	AvailablePorts []AvailablePort               `json:"availablePorts"`
 	CurrentPort    AvailablePort                 `json:"currentPort"`
+}
+
+func (t *Telemetry) SetValveStatesToUnknown() {
+	t.Status.HydraUF.PressurizingValve = valvestate.Unknown
+	t.Status.HydraUF.VentValve = valvestate.Unknown
+	t.Status.HydraLF.AbortValve = valvestate.Unknown
+	t.Status.HydraLF.MainValve = valvestate.Unknown
+	t.Status.HydraFS.N2O.FillValve = valvestate.Unknown
+	t.Status.HydraFS.N2O.PurgeValve = valvestate.Unknown
+	t.Status.HydraFS.N2.FillValve = valvestate.Unknown
+	t.Status.HydraFS.N2.PurgeValve = valvestate.Unknown
+	t.Status.HydraFS.QuickDC.N2OValve = valvestate.Unknown
+	t.Status.HydraFS.QuickDC.N2Valve = valvestate.Unknown
 }
 
 func (t *Telemetry) ToGrafanaString() string {
